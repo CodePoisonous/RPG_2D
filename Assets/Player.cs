@@ -8,12 +8,17 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb = null;
     private Animator anim = null;
 
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float jumpForce;
     private float xInput;
-
     //private int facingDir = 1;
     private bool isFaceingRight = true;
+
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float jumpForce;
+
+    [Header("Dash info")]
+    [SerializeField] private float dashSpeed;
+    [SerializeField] private float dashDuration;
+    [SerializeField] private float dashTime;
 
     [Header("Collision info")]
     [SerializeField] private float groundCheckDistance;
@@ -32,6 +37,10 @@ public class Player : MonoBehaviour
         checkInput();
         CollisionChecks();
         FlipCotroller();
+
+        if (Input.GetKeyDown(KeyCode.RightShift) && rb.velocity.x != 0.0) dashTime = dashDuration;
+        if (dashTime > 0) dashTime -= Time.deltaTime;
+
         AnimatorContollers();
     }
 
@@ -45,7 +54,10 @@ public class Player : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Movement()
     {
-        rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+        if (dashTime > 0)
+            rb.velocity = new Vector2(xInput * dashSpeed, 0);
+        else
+            rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
 
     private void checkInput()
@@ -86,6 +98,7 @@ public class Player : MonoBehaviour
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("isMoving", rb.velocity.x != 0);
         anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isDashing", dashTime > 0);
     }
 
 }

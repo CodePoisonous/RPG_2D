@@ -215,7 +215,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b55dbcb09bcf8df46b09a313763ba7f4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -312,7 +312,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -419,6 +419,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   jumpForce: 10
+  dashSpeed: 25
+  dashDuration: 0.25
+  dashTime: 0
   groundCheckDistance: 1.4
   groundMask:
     serializedVersion: 2
@@ -646,7 +649,7 @@ Transform:
   m_GameObject: {fileID: 2104406912}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5885, y: -4.14, z: 0}
+  m_LocalPosition: {x: 0.14, y: -4.14, z: 0}
   m_LocalScale: {x: 29.2693, y: 0.4093298, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
