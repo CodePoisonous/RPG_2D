@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb = null;
     private Animator anim = null;
 
-    private float xInput;
+    private float xInput = 0;
     //private int facingDir = 1;
     private bool isFaceingRight = true;
 
@@ -18,12 +18,18 @@ public class Player : MonoBehaviour
     [Header("Dash info")]
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDuration;
-    [SerializeField] private float dashTime;
+    private float dashTime = 0;
+    [SerializeField] private float dashCooldown;
+    private float dashCooldownTimer = 0;
+
+    [Header("Attack info")]
+    private bool isAttaching = false;
+    private int comboCounter = 0;
 
     [Header("Collision info")]
     [SerializeField] private float groundCheckDistance;
     [SerializeField] private LayerMask groundMask;
-    private bool isGrounded;
+    private bool isGrounded = false;
 
     void Start()
     {
@@ -33,17 +39,24 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Movement();
         checkInput();
+        Movement();
         CollisionChecks();
         FlipCotroller();
 
-        if (Input.GetKeyDown(KeyCode.RightShift) && rb.velocity.x != 0.0) dashTime = dashDuration;
-        if (dashTime > 0) dashTime -= Time.deltaTime;
+        if (dashCooldownTimer >= 0) dashCooldownTimer -= Time.deltaTime;
+        if (dashTime >= 0) dashTime -= Time.deltaTime;
 
         AnimatorContollers();
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void AttachOver()
+    {
+        isAttaching = false;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, 
@@ -63,8 +76,27 @@ public class Player : MonoBehaviour
     private void checkInput()
     {
         xInput = Input.GetAxis("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            isAttaching = true;
+            //comboCounter += 1;
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightShift))
+            DashAbility();
+
         if (Input.GetKeyDown(KeyCode.Space) 
             && isGrounded) Jump();
+    }
+
+    private void DashAbility()
+    {
+        if (rb.velocity.x != 0.0 && dashCooldownTimer < 0)
+        {
+            dashTime = dashDuration;
+            dashCooldownTimer = dashCooldown;
+        }
     }
 
     private void Jump()
@@ -99,6 +131,7 @@ public class Player : MonoBehaviour
         anim.SetBool("isMoving", rb.velocity.x != 0);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isDashing", dashTime > 0);
+        anim.SetBool("isAttaching", isAttaching);
+        anim.SetInteger("comboCounter", comboCounter);
     }
-
 }
