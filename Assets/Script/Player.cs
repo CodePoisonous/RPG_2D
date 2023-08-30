@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     private Animator anim = null;
 
     private float xInput = 0;
-    //private int facingDir = 1;
+    private int facingDir = 1;
     private bool isFaceingRight = true;
 
     [SerializeField] private float moveSpeed;
@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
     private float dashCooldownTimer = 0;
 
     [Header("Attack info")]
+    [SerializeField] private float comboTime;
+    private float comboTimeWindow = 0;
     private bool isAttaching = false;
     private int comboCounter = 0;
 
@@ -39,13 +41,14 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        checkInput();
+        CheckInput();
         Movement();
         CollisionChecks();
         FlipCotroller();
 
         if (dashCooldownTimer >= 0) dashCooldownTimer -= Time.deltaTime;
         if (dashTime >= 0) dashTime -= Time.deltaTime;
+        if(comboTimeWindow >= 0) comboTimeWindow -= Time.deltaTime;
 
         AnimatorContollers();
     }
@@ -54,6 +57,8 @@ public class Player : MonoBehaviour
     public void AttachOver()
     {
         isAttaching = false;
+        ++comboCounter;
+        if(comboCounter > 2) comboCounter = 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,32 +72,42 @@ public class Player : MonoBehaviour
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Movement()
     {
-        if (dashTime > 0)
-            rb.velocity = new Vector2(xInput * dashSpeed, 0);
+        if (isAttaching)
+            rb.velocity = new Vector2(0, 0);
+        else if (dashTime > 0)
+            rb.velocity = new Vector2(facingDir * dashSpeed, 0);
         else
             rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
 
-    private void checkInput()
+    private void CheckInput()
     {
         xInput = Input.GetAxis("Horizontal");
 
         if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            isAttaching = true;
-            //comboCounter += 1;
-        }
+            StartAttachEvent();
 
-        if (Input.GetKeyDown(KeyCode.RightShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
             DashAbility();
 
         if (Input.GetKeyDown(KeyCode.Space) 
             && isGrounded) Jump();
     }
 
+    private void StartAttachEvent()
+    {
+        if (!isGrounded) return;
+
+        if (comboTimeWindow < 0) comboCounter = 0;
+
+        isAttaching = true;
+        comboTimeWindow = comboTime;
+    }
+
     private void DashAbility()
     {
-        if (rb.velocity.x != 0.0 && dashCooldownTimer < 0)
+        if (dashCooldownTimer < 0
+            && !isAttaching)
         {
             dashTime = dashDuration;
             dashCooldownTimer = dashCooldown;
@@ -120,7 +135,7 @@ public class Player : MonoBehaviour
 
     private void Flip()
     {
-        //facingDir *= -1;
+        facingDir *= -1;
         isFaceingRight = !isFaceingRight;
         transform.Rotate(0, 180, 0);
     }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class playerAnimEvents : MonoBehaviour
+public class PlayerAnimEvents : MonoBehaviour
 {
     private Player player = null;
 
@@ -16,5 +16,4 @@ public class playerAnimEvents : MonoBehaviour
     {
         player.AttachOver();
     }
-
 }
