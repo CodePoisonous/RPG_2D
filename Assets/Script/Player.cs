@@ -3,47 +3,38 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Entity
 {
-    private Rigidbody2D rb = null;
-    private Animator anim = null;
+    private float xInput;
 
-    private float xInput = 0;
-    private int facingDir = 1;
-    private bool isFaceingRight = true;
-
+    [Header("Move Info")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
 
-    [Header("Dash info")]
+    [Header("Dash Info")]
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDuration;
-    private float dashTime = 0;
+    private float dashTime;
     [SerializeField] private float dashCooldown;
-    private float dashCooldownTimer = 0;
+    private float dashCooldownTimer;
 
-    [Header("Attack info")]
+    [Header("Attack Info")]
     [SerializeField] private float comboTime;
-    private float comboTimeWindow = 0;
-    private bool isAttaching = false;
-    private int comboCounter = 0;
+    private float comboTimeWindow;
+    private bool isAttaching;
+    private int comboCounter;
 
-    [Header("Collision info")]
-    [SerializeField] private float groundCheckDistance;
-    [SerializeField] private LayerMask groundMask;
-    private bool isGrounded = false;
-
-    void Start()
+    protected override void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponentInChildren<Animator>();
+        base.Start();
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         CheckInput();
         Movement();
-        CollisionChecks();
         FlipCotroller();
 
         if (dashCooldownTimer >= 0) dashCooldownTimer -= Time.deltaTime;
@@ -59,15 +50,7 @@ public class Player : MonoBehaviour
         isAttaching = false;
         ++comboCounter;
         if(comboCounter > 2) comboCounter = 0;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, 
-            new Vector3(transform.position.x,
-            transform.position.y - groundCheckDistance));
-    }
+    } 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Movement()
@@ -119,27 +102,13 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
 
-    private void CollisionChecks()
-    {
-        // 向场景中的碰撞体投射射线。
-        isGrounded = Physics2D.Raycast(transform.position, 
-            Vector2.down, groundCheckDistance, groundMask);
-    }    
-
     private void FlipCotroller()
     {
         if ((rb.velocityX > 0 && !isFaceingRight)
             || (rb.velocityX < 0 && isFaceingRight))
             Flip();
     }
-
-    private void Flip()
-    {
-        facingDir *= -1;
-        isFaceingRight = !isFaceingRight;
-        transform.Rotate(0, 180, 0);
-    }
-
+    
     private void AnimatorContollers()
     {
         anim.SetFloat("yVelocity", rb.velocity.y);
