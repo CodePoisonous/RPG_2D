@@ -711,6 +711,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 12
   jumpForce: 12
+  isFacingRight: 1
+  dashSpeed: 25
+  dashDuration: 0.2
+  groundCheck: {fileID: 327903197}
+  groundCheckDistance: 0.15
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 8
+  wallCheck: {fileID: 1541225315}
+  wallCheckDistance: 0.2
+  whatIsWall:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!70 &1147592166
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
