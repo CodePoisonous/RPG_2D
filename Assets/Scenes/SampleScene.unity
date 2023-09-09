@@ -291,8 +291,8 @@ Transform:
   m_GameObject: {fileID: 164701221}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.03, y: 0.09, z: 0}
-  m_LocalScale: {x: 1.9435844, y: 2.9099092, z: 1}
+  m_LocalPosition: {x: 3.08, y: -0.8496, z: 0}
+  m_LocalScale: {x: 2.9837909, y: 5.8908205, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -359,7 +359,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: b55dbcb09bcf8df46b09a313763ba7f4, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -661,7 +661,7 @@ Transform:
   m_GameObject: {fileID: 1147592160}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.56, z: 0}
+  m_LocalPosition: {x: -3.45, y: -2.39, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -711,19 +711,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 12
   jumpForce: 12
-  isFacingRight: 1
+  dashCooldown: 1
   dashSpeed: 25
   dashDuration: 0.2
   groundCheck: {fileID: 327903197}
   groundCheckDistance: 0.15
+  wallCheck: {fileID: 1541225315}
+  wallCheckDistance: 0.1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  wallCheck: {fileID: 1541225315}
-  wallCheckDistance: 0.2
-  whatIsWall:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!70 &1147592166
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -734,7 +731,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b55dbcb09bcf8df46b09a313763ba7f4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -906,7 +903,7 @@ Transform:
   m_GameObject: {fileID: 1541225314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.535, y: 0, z: 0}
+  m_LocalPosition: {x: 0.599, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

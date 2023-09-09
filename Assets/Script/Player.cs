@@ -6,24 +6,24 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [Header("Move Info")]
-    [SerializeField] public float moveSpeed = 12f;
-    [SerializeField] public float jumpForce = 12f;
+    public float moveSpeed = 12f;
+    public float jumpForce = 12f;
     public int facingDir { get; private set; } = 1;
-    public bool isFacingRight = true;
+    private bool isFacingRight = true;
 
     [Header("Dash Info")]
-    [SerializeField] public float dashSpeed = 25f;
-    [SerializeField] public float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 1f;
+    private float dashUsageTimer = 0f;
+    public float dashSpeed = 25f;
+    public float dashDuration = 0.2f;
     public float dashDir { get; private set; } = 1f;
 
     [Header("Collision Info")]
     [SerializeField] public Transform groundCheck;
     [SerializeField] public float groundCheckDistance = 0.15f;
-    [SerializeField] public LayerMask whatIsGround;
     [SerializeField] public Transform wallCheck;
     [SerializeField] public float wallCheckDistance = 0.2f;
-    [SerializeField] public LayerMask whatIsWall;
-
+    [SerializeField] public LayerMask whatIsGround;
 
     #region Components
     public Animator anim { get; private set; }
@@ -36,6 +36,8 @@ public class Player : MonoBehaviour
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
+    public PlayerWallSlideState wallSlideState { get; private set; }
+    public PlayerWallJump wallJumpState { get; private set; }
     public PlayerDashState dashState { get; private set; }
     #endregion
 
@@ -51,6 +53,10 @@ public class Player : MonoBehaviour
     public bool IsGroundDetected()
         => Physics2D.Raycast(groundCheck.position, 
             Vector2.down, groundCheckDistance, whatIsGround);
+
+    public bool IsWallDetected()
+        => Physics2D.Raycast(wallCheck.position, 
+            Vector2.right * facingDir, wallCheckDistance, whatIsGround);
 
     public void FlipController(float _x)
     {
@@ -76,6 +82,8 @@ public class Player : MonoBehaviour
         moveState = new PlayerMoveState(this, stateMachine, "Move");
         jumpState = new PlayerJumpState(this, stateMachine, "Jump");
         airState = new PlayerAirState(this, stateMachine, "Jump");
+        wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
+        wallJumpState = new PlayerWallJump(this, stateMachine, "Jump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
     }
 
@@ -96,8 +104,13 @@ public class Player : MonoBehaviour
 
     private void CheckForDashInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (IsWallDetected()) return;
+
+        dashUsageTimer -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashUsageTimer < 0)
         {
+            dashUsageTimer = dashCooldown;
             dashDir = Input.GetAxisRaw("Horizontal");
 
             if(dashDir != 0)
