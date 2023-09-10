@@ -4,7 +4,10 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 public class Player : MonoBehaviour
-{
+{    
+    [Header("Attack Details")]
+    public Vector2[] attackMovement;
+
     [Header("Move Info")]
     public float moveSpeed = 12f;
     public float jumpForce = 12f;
@@ -25,6 +28,8 @@ public class Player : MonoBehaviour
     [SerializeField] public float wallCheckDistance = 0.2f;
     [SerializeField] public LayerMask whatIsGround;
 
+    public bool isBusy { get; private set; }
+
     #region Components
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
@@ -39,17 +44,24 @@ public class Player : MonoBehaviour
     public PlayerWallSlideState wallSlideState { get; private set; }
     public PlayerWallJump wallJumpState { get; private set; }
     public PlayerDashState dashState { get; private set; }
+    public playerPrimaryAttack PrimaryAttack { get; private set; }
     #endregion
 
 
-    // public interface
-    ///////////////////////////////////////////////////////////////////
+    // Public Interface
+    //////////////////////////////////////////////////////////////////
+    #region Velocity
+    public void ZeroVelocity() 
+        => rb.velocity = new Vector2(0, 0);
+
     public void SetVelocity(float _xVelocity, float _yVelocity)
     {
         rb.velocity = new Vector2(_xVelocity, _yVelocity);
         FlipController(_xVelocity);
     }
+    #endregion
 
+    #region Collision
     public bool IsGroundDetected()
         => Physics2D.Raycast(groundCheck.position, 
             Vector2.down, groundCheckDistance, whatIsGround);
@@ -57,7 +69,9 @@ public class Player : MonoBehaviour
     public bool IsWallDetected()
         => Physics2D.Raycast(wallCheck.position, 
             Vector2.right * facingDir, wallCheckDistance, whatIsGround);
+    #endregion
 
+    #region Flip
     public void FlipController(float _x)
     {
         if (_x > 0 && !isFacingRight
@@ -71,9 +85,23 @@ public class Player : MonoBehaviour
         isFacingRight = !isFacingRight;
         transform.Rotate(0, 180, 0);
     }
+    #endregion
 
-    /// private interface
-    /// ///////////////////////////////////////////////////////////////
+    public void AnimationTrigger()
+        => stateMachine.currentState.AnimationFinishTrigger();
+
+    public IEnumerator BusyFor(float _seconds)
+    {
+        isBusy = true;
+
+        // 使用协程等待second时间
+        yield return new WaitForSeconds(_seconds);
+
+        isBusy = false;
+    }
+
+    // private interface
+    //////////////////////////////////////////////////////////////////
     private void Awake()
     {
         stateMachine = new PlayerStateMachine();
@@ -85,6 +113,7 @@ public class Player : MonoBehaviour
         wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJumpState = new PlayerWallJump(this, stateMachine, "Jump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
+        PrimaryAttack = new playerPrimaryAttack(this, stateMachine, "Attack");
     }
 
     private void Start()
@@ -118,6 +147,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region Collision
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(groundCheck.position,
@@ -125,4 +155,5 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(wallCheck.position,
             new(wallCheck.position.x + wallCheckDistance, wallCheck.position.y));
     }
+    #endregion
 }
